@@ -33,7 +33,7 @@ print("AppEngine version: " .. Engine.getVersion())
 local FILE_PATH = "resources/flat_object.pcd"
 
 -- Pausing duration for demonstration purpose only
-local PAUSE = 2000
+local DELAY = 2000
 
 -- Setup viewer and decoration
 local viewer = View.create()
@@ -60,7 +60,7 @@ local function viewPointCloud(pc)
   viewer:clear()
   viewer:addPointCloud(pc)
   viewer:present()
-  Script.sleep(PAUSE) -- For demonstration purpose only
+  Script.sleep(DELAY) -- For demonstration purpose only
 end
 
 -- Entry point after Engine.OnStarted event
