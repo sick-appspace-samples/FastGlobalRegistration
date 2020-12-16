@@ -36,8 +36,7 @@ local FILE_PATH = "resources/flat_object.pcd"
 local DELAY = 2000
 
 -- Setup viewer and decoration
-local viewer = View.create()
-viewer:setID("viewer3D")
+local viewer = View.create('viewer3D1')
 
 local deco = View.PointCloudDecoration.create()
 deco:setPointSize(1)
