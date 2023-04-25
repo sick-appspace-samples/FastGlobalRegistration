@@ -10,11 +10,9 @@ local FILE_PATH = "resources/flat_object.pcd"
 local DELAY = 2000
 
 -- Setup viewer and decoration
-local viewer = View.create('viewer3D1')
+local viewer = View.create()
 
-local deco = View.PointCloudDecoration.create()
-deco:setPointSize(1)
-deco:setIntensityColormap(1)
+local deco = View.PointCloudDecoration.create():setPointSize(1):setIntensityColormap(1)
 viewer:setDefaultDecoration(deco)
 
 -- Setup fast global registration
