@@ -10,11 +10,9 @@ local FILE_PATH = "resources/flat_object.pcd"
 local DELAY = 2000
 
 -- Setup viewer and decoration
-local viewer = View.create('viewer3D1')
+local viewer = View.create()
 
-local deco = View.PointCloudDecoration.create()
-deco:setPointSize(1)
-deco:setIntensityColormap(1)
+local deco = View.PointCloudDecoration.create():setPointSize(1):setIntensityColormap(1)
 viewer:setDefaultDecoration(deco)
 
 -- Setup fast global registration
@@ -36,52 +34,52 @@ local function viewPointCloud(pc)
   Script.sleep(DELAY) -- For demonstration purpose only
 end
 
--- Entry point after Engine.OnStarted event
+---Entry point after Engine.OnStarted event
 local function handleOnStarted()
 
   -- Load input point cloud
   local cloud1 = PointCloud.load(FILE_PATH)
-  
+
   -- Create a ridgid transformation of the cloud (rotation + translation)
   local rigidTransform = Transform.createRigidAxisAngle3D({0.1, -0.2, 0.9}, 0.57, 10, 23, 80)
   local cloud2 = cloud1:transform(rigidTransform)
-  
+
   viewPointCloud(cloud1)
   viewPointCloud(cloud2)
-  
+
   -- Sample both clouds with a different number of points
   cloud1 = cloud1:sample(12000)
   cloud2 = cloud2:sample(15000)
-  
+
   -- Remove outliers
   cloud1 = cloud1:filterStatisticalOutliers()
   cloud2 = cloud2:filterStatisticalOutliers()
-  
+
   -- Smooth point clouds
   local tic = DateTime.getTimestamp()
   cloud1 = cloud1:filterMovingLeastSquares(10)
   cloud2 = cloud2:filterMovingLeastSquares(10)
   local toc = DateTime.getTimestamp()
   print("Smoothing both clouds took "..toc - tic.." ms")
-  
+
   -- View both clouds
   viewPointCloud(cloud1)
   viewPointCloud(cloud2)
-  
+
   -- Compute surface normals
   tic = DateTime.getTimestamp()
   local normals1 = cloud1:featureNormals(10, "RADIUS_SEARCH")
   local normals2 = cloud2:featureNormals(10, "RADIUS_SEARCH")
   toc = DateTime.getTimestamp()
   print("Computing the normals for both clouds took "..toc - tic.." ms")
-  
+
   -- Compute the FPFH feature description used for the registration
   tic = DateTime.getTimestamp()
   local features1 = cloud1:featureFPFH(normals1, 10, "RADIUS_SEARCH")
   local features2 = cloud2:featureFPFH(normals2, 10, "RADIUS_SEARCH")
   toc = DateTime.getTimestamp()
   print("Computing the FPFH for both clouds took "..toc - tic.." ms")
-  
+
   -- Compute the registration
   tic = DateTime.getTimestamp()
   local estimatedTransform = reg:compute(cloud1, features1, cloud2, features2)
@@ -89,10 +87,10 @@ local function handleOnStarted()
   print("Computing the registration took "..toc - tic.." ms")
   print("\nEstimated rigid transformation:")
   print(estimatedTransform:toString())
-  
+
   -- Transform the second cloud back to its original position
   cloud2 = cloud2:transform(estimatedTransform)
-  
+
   -- Merge the two clouds, setting a fix intensity for each of them
   local size1 = cloud1:getSize()
   local size2 = cloud2:getSize()
@@ -105,10 +103,10 @@ local function handleOnStarted()
     local x, y, z, _ = cloud2:getPoint(pos)
     mergedCloud:appendPoint(x, y, z, 1.0)
   end
-  
+
   -- View the merged cloud (each cloud is visualized in a different color)
   viewPointCloud(mergedCloud)
-  
+
   print("App finished")
 end
 --The following registration is part of the global scope which runs once after startup
